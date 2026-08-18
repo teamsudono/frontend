@@ -1889,7 +1889,6 @@ interface SavedMeeting {
   date: string
   fileName: string
   preview: string
-  participants: string[]
   keyPoints: string[]
   decisions: string[]
   actions: string[]
@@ -1903,7 +1902,6 @@ const SAMPLE_MEETINGS: SavedMeeting[] = [
     date: '2026-08-14',
     fileName: 'q3_partnership_review.pdf',
     preview: 'Reviewed Q3 performance metrics showing 23% growth. Discussed Southeast Asia expansion and partnership renewal.',
-    participants: ['Alex Kim (CBO)', 'Sarah Chen (Strategy)', 'Michael Torres (Legal)'],
     keyPoints: ['Q3 revenue showed 23% year-over-year growth across all markets', 'Southeast Asia expansion targeted for Q1 2027 launch', 'Partnership agreement approaching renewal — terms under renegotiation', 'Technical integration roadmap presented with 6-month estimated timeline'],
     decisions: ['Extend partnership agreement by 2 years with revised terms', 'Approve $2.4M budget for market expansion initiative', 'Select Singapore as the first Southeast Asian hub location'],
     actions: ['Alex: Draft updated partnership contract by Aug 20', 'Finance: Submit budget allocation request to board by Aug 15', 'Marketing: Develop Southeast Asia market entry strategy by Sep 1'],
@@ -1915,7 +1913,6 @@ const SAMPLE_MEETINGS: SavedMeeting[] = [
     date: '2026-08-10',
     fileName: 'sprint_planning_aug10.docx',
     preview: 'Planned integration sprint for API alignment and dashboard localization across three regional teams.',
-    participants: ['Ji-ho Park (Engineering Lead)', 'Emma Wilson (Product)', 'Carlos Mendez (QA)', 'Yuki Tanaka (Localization)'],
     keyPoints: ['API integration requires 6-week development timeline', 'Dashboard must fully support Korean, Japanese, and Portuguese locales', 'QA sign-off required before regional launch', 'Feature freeze date set two weeks before launch'],
     decisions: ['Sprint start date: August 18', 'Bi-weekly syncs every Monday and Thursday at 9 AM UTC', 'Regional QA leads assigned per market: APAC, LATAM, EMEA'],
     actions: ['Dev: Complete API spec documentation by Aug 16', 'Design: Finalize localized UI mockups by Aug 19', 'QA: Prepare regional test case suite by Aug 21', 'Yuki: Deliver all translation strings by Aug 23'],
@@ -2065,7 +2062,6 @@ function MeetingsTab({ lang, profile, savedMeetings, setSavedMeetings }: {
       date: new Date().toISOString().slice(0, 10),
       fileName: uploadedFile?.name || 'meeting.txt',
       preview: summary.overview,
-      participants: ['Alex Kim', 'Sarah Chen', 'Michael Torres'],
       keyPoints: summary.points,
       decisions: summary.decisions,
       actions: summary.actions,
@@ -2203,16 +2199,6 @@ function MeetingsTab({ lang, profile, savedMeetings, setSavedMeetings }: {
           </div>
         </div>
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '16px 20px 32px' }}>
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: C.sub, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>
-              {'👥'} {lbl('참가자', '参加者', '参与者', 'Participantes', 'Participantes', 'Participants')}
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              {selectedSaved.participants.map((p, i) => (
-                <span key={i} style={{ fontSize: 12, padding: '4px 10px', borderRadius: 100, background: C.primaryLight, color: C.primary, fontWeight: 600 }}>{p}</span>
-              ))}
-            </div>
-          </div>
           <div style={{ padding: '14px', borderRadius: 14, background: C.primaryLight, border: `1px solid ${C.primary}`, marginBottom: 14 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{t('meetingOverview')}</div>
             <div style={{ fontSize: 13, color: C.text, lineHeight: 1.5 }}>{selectedSaved.overview}</div>
@@ -2237,16 +2223,6 @@ function MeetingsTab({ lang, profile, savedMeetings, setSavedMeetings }: {
           </div>
         </div>
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '16px 20px 32px' }}>
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: C.sub, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>
-              {'👥'} {lbl('참가자', '参加者', '参与者', 'Participantes', 'Participantes', 'Participants')}
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              {['Alex Kim', 'Sarah Chen', 'Michael Torres'].map((p, i) => (
-                <span key={i} style={{ fontSize: 12, padding: '4px 10px', borderRadius: 100, background: C.primaryLight, color: C.primary, fontWeight: 600 }}>{p}</span>
-              ))}
-            </div>
-          </div>
           <div style={{ padding: '14px', borderRadius: 14, background: C.primaryLight, border: `1px solid ${C.primary}`, marginBottom: 14 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{t('meetingOverview')}</div>
             <div style={{ fontSize: 13, color: C.text, lineHeight: 1.5 }}>{summary.overview}</div>
