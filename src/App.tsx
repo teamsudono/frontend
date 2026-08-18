@@ -1727,49 +1727,83 @@ function MeetingTimeFeature({ lang }: { lang: Lang }) {
 }
 
 // ─── Meeting Summary ──────────────────────────────────────────────────────────
-const MEETING_SUMMARY_DATA: Record<Lang, { overview: string; points: string[]; decisions: string[]; actions: string[]; followUp: string }> = {
-  en: {
-    overview: 'Q3 Partnership Review — 47 minutes · 3 participants · Global Business Collaboration Platform',
-    points: ['Reviewed Q3 performance metrics showing 23% growth year-over-year', 'Discussed expansion plans into Southeast Asian markets', 'Evaluated current partnership agreement terms and proposed amendments', 'Technical integration roadmap presented — estimated 6-month timeline'],
-    decisions: ['Agreed to extend partnership agreement by 2 years with revised terms', 'Approved budget of $2.4M for market expansion initiative', 'Selected Singapore as the first Southeast Asian hub location'],
-    actions: ['[Alex] Prepare updated partnership contract draft by August 20', '[Team] Conduct technical feasibility study within 3 weeks', '[Finance] Submit budget allocation request to board by August 15', '[Marketing] Develop Southeast Asia market entry strategy'],
-    followUp: 'Next meeting scheduled for September 5 to review action items. Legal team must be involved in contract revisions. All documents to be shared via secure channel.',
-  },
-  ko: {
-    overview: 'Q3 파트너십 검토 — 47분 · 참가자 3명 · 글로벌 비즈니스 협업 플랫폼',
-    points: ['전년 대비 23% 성장률을 보여주는 Q3 성과 지표 검토', '동남아시아 시장 확장 계획 논의', '현행 파트너십 계약 조건 평가 및 개정안 제안', '기술 통합 로드맵 발표 — 약 6개월 일정 예상'],
-    decisions: ['수정된 조건으로 파트너십 계약 2년 연장 합의', '시장 확장 계획에 240만 달러 예산 승인', '싱가포르를 동남아시아 첫 번째 허브 위치로 선정'],
-    actions: ['[Alex] 8월 20일까지 업데이트된 파트너십 계약 초안 준비', '[팀] 3주 이내 기술 타당성 조사 실시', '[재무] 8월 15일까지 이사회에 예산 배정 요청서 제출', '[마케팅] 동남아시아 시장 진출 전략 개발'],
-    followUp: '액션 아이템 검토를 위한 다음 회의는 9월 5일에 예정되어 있습니다. 법무팀이 계약 수정에 참여해야 합니다.',
-  },
-  ja: {
-    overview: 'Q3パートナーシップレビュー — 47分 · 参加者3名 · グローバルビジネスコラボレーションプラットフォーム',
-    points: ['前年比23%成長を示すQ3パフォーマンス指標のレビュー', '東南アジア市場への展開計画の議論', '現行パートナーシップ契約条件の評価と改訂案の提案', '技術統合ロードマップの発表 — 約6ヶ月のタイムライン'],
-    decisions: ['修正条件でパートナーシップ契約を2年延長することに合意', '市場拡大計画に240万ドルの予算を承認', 'シンガポールを東南アジア初のハブ拠点として選定'],
-    actions: ['[Alex] 8月20日までに更新されたパートナーシップ契約草案を準備', '[チーム] 3週間以内に技術的実現可能性調査を実施', '[財務] 8月15日までに取締役会に予算配分申請書を提出'],
-    followUp: 'アクションアイテムのレビューのために9月5日に次回会議を予定しています。契約改訂には法務チームの参加が必要です。',
-  },
-  zh: {
-    overview: 'Q3合作关系审查 — 47分钟 · 3位参与者 · 全球商业协作平台',
-    points: ['审查显示同比增长23%的Q3绩效指标', '讨论进入东南亚市场的扩张计划', '评估现有合作协议条款并提出修订建议', '技术整合路线图发布 — 预计6个月时间表'],
-    decisions: ['同意以修订条款将合作协议延长2年', '批准240万美元的市场扩张预算', '选定新加坡为东南亚第一个枢纽地点'],
-    actions: ['[Alex] 8月20日前准备更新的合作合同草案', '[团队] 3周内完成技术可行性研究', '[财务] 8月15日前向董事会提交预算分配申请'],
-    followUp: '下次会议定于9月5日审查行动项目。合同修订需要法律团队参与。所有文件通过安全渠道共享。',
-  },
-  pt: {
-    overview: 'Revisão de Parceria Q3 — 47 minutos · 3 participantes · Plataforma de Colaboração Empresarial Global',
-    points: ['Revisão das métricas de desempenho do Q3 mostrando crescimento de 23% ano a ano', 'Discussão sobre planos de expansão para mercados do Sudeste Asiático', 'Avaliação dos termos do acordo de parceria atual e emendas propostas', 'Roadmap de integração técnica apresentado — prazo estimado de 6 meses'],
-    decisions: ['Acordado estender o acordo de parceria por 2 anos com termos revisados', 'Aprovado orçamento de US$ 2,4 milhões para iniciativa de expansão de mercado', 'Selecionada Singapura como primeiro local hub no Sudeste Asiático'],
-    actions: ['[Alex] Preparar rascunho atualizado do contrato de parceria até 20 de agosto', '[Equipe] Conduzir estudo de viabilidade técnica em 3 semanas', '[Financeiro] Enviar solicitação de alocação orçamentária ao conselho até 15 de agosto'],
-    followUp: 'Próxima reunião agendada para 5 de setembro para revisão dos itens de ação. A equipe jurídica deve estar envolvida nas revisões do contrato.',
-  },
-  es: {
-    overview: 'Revisión de Alianza Q3 — 47 minutos · 3 participantes · Plataforma de Colaboración Empresarial Global',
-    points: ['Revisión de métricas de rendimiento Q3 mostrando crecimiento del 23% interanual', 'Discusión sobre planes de expansión en mercados del Sudeste Asiático', 'Evaluación de términos del acuerdo de alianza actual y enmiendas propuestas', 'Roadmap de integración técnica presentado — plazo estimado de 6 meses'],
-    decisions: ['Acordado extender el acuerdo de alianza por 2 años con términos revisados', 'Aprobado presupuesto de $2.4M para iniciativa de expansión de mercado', 'Seleccionado Singapur como primera ubicación hub en el Sudeste Asiático'],
-    actions: ['[Alex] Preparar borrador actualizado del contrato de alianza para el 20 de agosto', '[Equipo] Realizar estudio de viabilidad técnica en 3 semanas', '[Finanzas] Enviar solicitud de asignación de presupuesto a la junta antes del 15 de agosto'],
-    followUp: 'Próxima reunión programada para el 5 de septiembre para revisar los elementos de acción. El equipo legal debe estar involucrado en las revisiones del contrato.',
-  },
+interface MeetingSummary {
+  overview: string
+  points: string[]
+  decisions: string[]
+  actions: string[]
+  followUp: string
+}
+
+interface MeetingSummaryApiResponse {
+  meeting_summary?: {
+    agreed?: unknown
+    disputed_or_pending?: unknown
+  }
+  todo_list?: unknown
+  [key: string]: unknown
+}
+
+const MEETING_SUMMARY_API_URL =
+  (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env?.VITE_MEETING_SUMMARY_API_URL
+  ?? '/api/meeting-summary'
+
+const toStringArray = (value: unknown): string[] => {
+  if (!Array.isArray(value)) return []
+  return value
+    .map(item => {
+      if (typeof item === 'string') return item.trim()
+      if (item && typeof item === 'object') {
+        const obj = item as Record<string, unknown>
+        const text = obj.task ?? obj.title ?? obj.summary ?? obj.description ?? obj.text
+        return typeof text === 'string' ? text.trim() : ''
+      }
+      return ''
+    })
+    .filter(Boolean)
+}
+
+const toActionArray = (value: unknown): string[] => {
+  if (!Array.isArray(value)) return []
+  return value
+    .map(item => {
+      if (typeof item === 'string') return item.trim()
+      if (!item || typeof item !== 'object') return ''
+      const obj = item as Record<string, unknown>
+      const task = typeof obj.task === 'string' ? obj.task.trim() : ''
+      const assignee = typeof obj.assignee === 'string' ? obj.assignee.trim() : ''
+      const dueDate = typeof obj.due_date === 'string' ? obj.due_date.trim() : ''
+      if (!task) return ''
+      const owner = assignee ? ` [${assignee}]` : ''
+      const due = dueDate ? ` — ${dueDate}` : ''
+      return `${task}${owner}${due}`
+    })
+    .filter(Boolean)
+}
+
+const normalizeMeetingSummary = (data: MeetingSummaryApiResponse, fileName: string): MeetingSummary => {
+  const meetingSummary = data.meeting_summary ?? {}
+  const agreed = toStringArray(meetingSummary.agreed)
+  const pending = toStringArray(meetingSummary.disputed_or_pending)
+  const actions = toActionArray(data.todo_list)
+
+  const overview = [
+    fileName,
+    `${agreed.length + pending.length} discussion item${agreed.length + pending.length === 1 ? '' : 's'}`,
+    `${actions.length} action item${actions.length === 1 ? '' : 's'}`,
+  ].join(' · ')
+
+  return {
+    overview,
+    points: [...agreed, ...pending],
+    decisions: agreed,
+    actions,
+    followUp: pending.length > 0
+      ? pending.join(' ')
+      : actions.length > 0
+        ? 'Follow-up is required for the action items listed above.'
+        : 'No additional follow-up items were returned by the backend.',
+  }
 }
 
 // ─── Meetings Tab ─────────────────────────────────────────────────────────────
@@ -1868,11 +1902,11 @@ function MeetingsTab({ lang, profile }: { lang: Lang; profile: UserProfile }) {
   const [uploadError, setUploadError] = useState('')
   const [isDragging, setIsDragging] = useState(false)
   const [processing, setProcessing] = useState(false)
+  const [summary, setSummary] = useState<MeetingSummary | null>(null)
   const [selectedSaved, setSelectedSaved] = useState<SavedMeeting | null>(null)
   const [saveConfirm, setSaveConfirm] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const summary = MEETING_SUMMARY_DATA[lang]
   const collabLabels = COLLAB_LABELS[lang]
   const activeCollab = info.collabSituation ? COLLAB_SITUATIONS.find(s => s.key === info.collabSituation) : null
   const activeCollabLabel = activeCollab ? collabLabels[COLLAB_SITUATIONS.indexOf(activeCollab)] : null
@@ -1896,6 +1930,7 @@ function MeetingsTab({ lang, profile }: { lang: Lang; profile: UserProfile }) {
     }
     setUploadError('')
     setUploadedFile(file)
+    setSummary(null)
     setSaveConfirm(false)
   }
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1905,11 +1940,61 @@ function MeetingsTab({ lang, profile }: { lang: Lang; profile: UserProfile }) {
     e.preventDefault(); setIsDragging(false)
     const file = e.dataTransfer.files?.[0]; if (file) handleFileSelect(file)
   }
-  const handleCreateSummary = () => {
+  const handleCreateSummary = async () => {
+    if (!uploadedFile) {
+      setUploadError('회의 파일을 먼저 선택해주세요.')
+      return
+    }
+
     setProcessing(true)
-    setTimeout(() => { setProcessing(false); setMeetingView('summary') }, 2200)
+    setUploadError('')
+    setSummary(null)
+
+    try {
+      const formData = new FormData()
+      formData.append('file', uploadedFile)
+      formData.append('lang', lang)
+
+      const response = await fetch(MEETING_SUMMARY_API_URL, {
+        method: 'POST',
+        body: formData,
+      })
+
+      const rawText = await response.text()
+      let data: MeetingSummaryApiResponse
+
+      try {
+        data = rawText ? JSON.parse(rawText) as MeetingSummaryApiResponse : {}
+      } catch {
+        throw new Error('백엔드가 올바른 JSON 응답을 반환하지 않았습니다.')
+      }
+
+      if (!response.ok) {
+        const message = typeof data.detail === 'string'
+          ? data.detail
+          : typeof data.message === 'string'
+            ? data.message
+            : `회의 요약 API 요청에 실패했습니다. (${response.status})`
+        throw new Error(message)
+      }
+
+      const normalized = normalizeMeetingSummary(data, uploadedFile.name)
+
+      if (normalized.points.length === 0 && normalized.actions.length === 0) {
+        throw new Error('백엔드 응답에 회의 요약 데이터가 없습니다.')
+      }
+
+      setSummary(normalized)
+      setMeetingView('summary')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '회의 요약 생성 중 오류가 발생했습니다.'
+      setUploadError(message)
+    } finally {
+      setProcessing(false)
+    }
   }
   const handleSaveMeeting = () => {
+    if (!summary) return
     const rawTitle = uploadedFile?.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ') || 'Meeting Summary'
     const newMeeting: SavedMeeting = {
       id: Date.now(),
@@ -1925,7 +2010,7 @@ function MeetingsTab({ lang, profile }: { lang: Lang; profile: UserProfile }) {
     }
     setSavedMeetings(prev => [newMeeting, ...prev])
     setSaveConfirm(true)
-    setTimeout(() => { setMeetingView('list'); setUploadedFile(null); setSaveConfirm(false) }, 1800)
+    setTimeout(() => { setMeetingView('list'); setUploadedFile(null); setSummary(null); setSaveConfirm(false) }, 1800)
   }
 
   const lbl = (ko: string, ja: string, zh: string, pt: string, es: string, en: string) =>
@@ -2078,11 +2163,11 @@ function MeetingsTab({ lang, profile }: { lang: Lang; profile: UserProfile }) {
   }
 
   // ── Generated summary ────────────────────────────────────────────────────────
-  if (meetingView === 'summary') {
+  if (meetingView === 'summary' && summary) {
     return (
       <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', background: C.bg }}>
         <div style={{ padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
-          <button onClick={() => setMeetingView('upload')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 22, color: C.text, padding: 2, lineHeight: 1 }}>{'‹'}</button>
+          <button onClick={() => { setMeetingView('upload'); setSummary(null) }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 22, color: C.text, padding: 2, lineHeight: 1 }}>{'‹'}</button>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 16, fontWeight: 700, color: C.text }}>{t('meetingSummaryTitle')}</div>
             <div style={{ fontSize: 11, color: C.sub, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{uploadedFile?.name}</div>
