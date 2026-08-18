@@ -1933,7 +1933,10 @@ interface MeetingInfo {
   collabSituation: string | null
 }
 
-function MeetingsTab({ lang, profile }: { lang: Lang; profile: UserProfile }) {
+function MeetingsTab({ lang, profile, savedMeetings, setSavedMeetings }: {
+  lang: Lang; profile: UserProfile
+  savedMeetings: SavedMeeting[]; setSavedMeetings: React.Dispatch<React.SetStateAction<SavedMeeting[]>>
+}) {
   const t = (k: string) => i18n(lang, k)
   const L = lang
 
@@ -1956,7 +1959,6 @@ function MeetingsTab({ lang, profile }: { lang: Lang; profile: UserProfile }) {
 
   type MView = 'home' | 'list' | 'upload' | 'summary' | 'detail'
   const [meetingView, setMeetingView] = useState<MView>('home')
-  const [savedMeetings, setSavedMeetings] = useState<SavedMeeting[]>([])
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [uploadError, setUploadError] = useState('')
   const [isDragging, setIsDragging] = useState(false)
@@ -3237,10 +3239,11 @@ function BottomNav({ tab, setTab, lang }: { tab: Tab; setTab: (t: Tab) => void; 
 }
 
 // ─── Home ─────────────────────────────────────────────────────────────────────
-function HomeScreen({ lang, profile, tab, setTab, convos, setConvos, trips, setTrips, onLangSettings, onLogout, onEditProfile, onUpdateProfile, showToast }: {
+function HomeScreen({ lang, profile, tab, setTab, convos, setConvos, trips, setTrips, savedMeetings, setSavedMeetings, onLangSettings, onLogout, onEditProfile, onUpdateProfile, showToast }: {
   lang: Lang; profile: UserProfile; tab: Tab; setTab: (t: Tab) => void
   convos: Convo[]; setConvos: React.Dispatch<React.SetStateAction<Convo[]>>
   trips: Trip[]; setTrips: React.Dispatch<React.SetStateAction<Trip[]>>
+  savedMeetings: SavedMeeting[]; setSavedMeetings: React.Dispatch<React.SetStateAction<SavedMeeting[]>>
   onLangSettings: () => void; onLogout: () => void
   onEditProfile: () => void; onUpdateProfile: (p: Partial<UserProfile>) => void; showToast: (msg: string) => void
 }) {
@@ -3285,7 +3288,7 @@ function HomeScreen({ lang, profile, tab, setTab, convos, setConvos, trips, setT
         {tab === 'messages' && chatView === 'detail' && selectedConvo && (
           <ChatDetailScreen lang={lang} convo={selectedConvo} onBack={() => { setChatView('list'); setSelectedConvoId(null) }} showToast={showToast} onMarkRead={() => markRead(selectedConvo.id)} onSendMessage={msg => appendMessage(selectedConvo.id, msg)} />
         )}
-        {tab === 'meetings' && <MeetingsTab lang={lang} profile={profile} />}
+        {tab === 'meetings' && <MeetingsTab lang={lang} profile={profile} savedMeetings={savedMeetings} setSavedMeetings={setSavedMeetings} />}
         {tab === 'trip' && tripView === 'list' && <TripListScreen lang={lang} trips={trips} onOpen={tr => { setSelectedTrip(tr); setTripView('detail') }} onNewTrip={() => setTripView('new')} onDeleteTrip={deleteTrip} onChangeStatus={changeStatus} />}
         {tab === 'trip' && tripView === 'detail' && selectedTrip && <TripDetailScreen lang={lang} trip={selectedTrip} onBack={() => { setTripView('list'); setSelectedTrip(null) }} />}
         {tab === 'trip' && tripView === 'new' && <NewTripFlow lang={lang} onClose={() => setTripView('list')} onAddTrip={addTrip} />}
@@ -3332,6 +3335,7 @@ export default function App() {
   const [homeTab, setHomeTab] = useState<Tab>('meetings')
   const [convos, setConvos] = useState<Convo[]>(CONVOS_INIT)
   const [trips, setTrips] = useState<Trip[]>(TRIPS_INIT)
+  const [savedMeetings, setSavedMeetings] = useState<SavedMeeting[]>([])
 
   const [profile, setProfile] = useState<UserProfile>(() => ({
     ...EMPTY_PROFILE,
@@ -3398,6 +3402,7 @@ export default function App() {
     setHomeTab('meetings')
     setConvos(CONVOS_INIT)
     setTrips(TRIPS_INIT)
+    setSavedMeetings([])
     setScreen('login')
   }
 
@@ -3421,6 +3426,7 @@ export default function App() {
             tab={homeTab} setTab={setHomeTab}
             convos={convos} setConvos={setConvos}
             trips={trips} setTrips={setTrips}
+            savedMeetings={savedMeetings} setSavedMeetings={setSavedMeetings}
             onLangSettings={handleLangSettings}
             onLogout={handleLogout}
             onEditProfile={handleEditProfile}
