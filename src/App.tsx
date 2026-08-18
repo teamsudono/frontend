@@ -3310,9 +3310,19 @@ const EMPTY_PROFILE: UserProfile = {
   lang: 'en', notifications: true, darkMode: false, password: '',
 }
 
+const LANG_STORAGE_KEY = 'gcai-lang'
+const VALID_LANGS: Lang[] = ['en', 'ko', 'ja', 'zh', 'pt', 'es']
+
 export default function App() {
   const [screen, setScreen] = useState<Screen>('splash')
-  const [lang, setLang] = useState<Lang>('en')
+  const [lang, setLangState] = useState<Lang>(() => {
+    const saved = localStorage.getItem(LANG_STORAGE_KEY)
+    return (VALID_LANGS as string[]).includes(saved ?? '') ? (saved as Lang) : 'en'
+  })
+  const setLang = (l: Lang) => {
+    localStorage.setItem(LANG_STORAGE_KEY, l)
+    setLangState(l)
+  }
   const [toast, setToast] = useState('')
   const [editingProfile, setEditingProfile] = useState(false)
   const [langFromProfile, setLangFromProfile] = useState(false)
