@@ -1290,23 +1290,38 @@ function SplashScreen({ lang, onStart }: { lang: Lang; onStart: () => void }) {
 }
 
 // ─── Login ────────────────────────────────────────────────────────────────────
-function LoginScreen({ lang, savedUser, onLogin, onSignUp, showToast }: {
-  lang: Lang; savedUser: { email: string; password: string } | null
-  onLogin: () => void; onSignUp: () => void; showToast: (msg: string) => void
+function LoginScreen({ lang, onLogin, onSignUp, showToast }: {
+  lang: Lang
+  onLogin: (token: string, user: AuthUser) => void
+  onSignUp: () => void; showToast: (msg: string) => void
 }) {
   const t = (k: string) => i18n(lang, k)
   const [email, setEmail] = useState('')
   const [pass, setPass] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setError('')
     if (!email || !pass) return
-    if (savedUser && email === savedUser.email && pass === savedUser.password) {
+    setLoading(true)
+    try {
+      const response = await fetch(AUTH_LOGIN_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pass }),
+      })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setError(typeof data.detail === 'string' ? data.detail : t('loginError'))
+        return
+      }
       showToast(t('loginSuccess'))
-      setTimeout(onLogin, 900)
-    } else {
+      onLogin(data.access_token, data.user)
+    } catch {
       setError(t('loginError'))
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -1328,7 +1343,7 @@ function LoginScreen({ lang, savedUser, onLogin, onSignUp, showToast }: {
         <div style={{ textAlign: 'right', marginBottom: error ? 16 : 28 }}>
           <span style={{ fontSize: 13, color: C.primary, fontWeight: 600, cursor: 'pointer' }}>{t('forgotPassword')}</span>
         </div>
-        <Btn label={t('logIn')} onClick={handleLogin} />
+        <Btn label={loading ? '…' : t('logIn')} onClick={handleLogin} />
         <p style={{ textAlign: 'center', fontSize: 14, color: C.sub, marginTop: 24 }}>
           {t('noAccount')}{' '}<span onClick={onSignUp} style={{ color: C.primary, fontWeight: 700, cursor: 'pointer' }}>{t('signUp')}</span>
         </p>
@@ -1341,11 +1356,41 @@ function LoginScreen({ lang, savedUser, onLogin, onSignUp, showToast }: {
 // ─── Sign Up ──────────────────────────────────────────────────────────────────
 interface SignupData { name: string; company: string; email: string; password: string }
 
-function SignUpScreen({ lang, onCreated, onBack, showToast }: { lang: Lang; onCreated: (data: SignupData) => void; onBack: () => void; showToast: (msg: string) => void }) {
+function SignUpScreen({ lang, onCreated, onBack, showToast }: {
+  lang: Lang
+  onCreated: (data: SignupData, token: string, user: AuthUser) => void
+  onBack: () => void; showToast: (msg: string) => void
+}) {
   const t = (k: string) => i18n(lang, k)
   const [name, setName] = useState(''); const [company, setCompany] = useState('')
   const [email, setEmail] = useState(''); const [pass, setPass] = useState(''); const [confirm, setConfirm] = useState('')
-  const handleCreate = () => { showToast(t('registrationSuccess')); setTimeout(() => onCreated({ name, company, email, password: pass }), 900) }
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const handleCreate = async () => {
+    setError('')
+    if (!email || !pass) return
+    if (pass !== confirm) { setError(t('loginError')); return }
+    setLoading(true)
+    try {
+      const response = await fetch(AUTH_SIGNUP_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pass, name, company }),
+      })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setError(typeof data.detail === 'string' ? data.detail : t('loginError'))
+        return
+      }
+      showToast(t('registrationSuccess'))
+      onCreated({ name, company, email, password: pass }, data.access_token, data.user)
+    } catch {
+      setError(t('loginError'))
+    } finally {
+      setLoading(false)
+    }
+  }
   return (
     <div className="anim-slide" style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'linear-gradient(165deg, #021024 0%, #052659 40%, #3B62D0 75%, #5483B3 100%)', minHeight: 0, position: 'relative', overflow: 'hidden' }}>
       <StatusBar time="9:41 AM" dark />
@@ -1365,7 +1410,12 @@ function SignUpScreen({ lang, onCreated, onBack, showToast }: { lang: Lang; onCr
           <Input label={t('password')} type="password" value={pass} onChange={setPass} placeholder={t('createPasswordPlaceholder')} />
           <Input label={t('confirmPassword')} type="password" value={confirm} onChange={setConfirm} placeholder={t('confirmPasswordPlaceholder')} />
         </div>
-        <Btn label={t('createAccount')} onClick={handleCreate} />
+        {error && (
+          <div style={{ padding: '10px 14px', borderRadius: 10, background: CV.redTint, border: `1px solid ${CV.redBorder}`, marginBottom: 16, fontSize: 13, color: C.error, fontWeight: 500 }}>
+            {error}
+          </div>
+        )}
+        <Btn label={loading ? '…' : t('createAccount')} onClick={handleCreate} />
         <p style={{ textAlign: 'center', fontSize: 14, color: C.sub, marginTop: 24 }}>
           {t('alreadyAccount')}{' '}<span style={{ color: C.primary, fontWeight: 700, cursor: 'pointer' }} onClick={onBack}>{t('signIn')}</span>
         </p>
@@ -1748,6 +1798,15 @@ const MEETING_SUMMARY_API_URL =
   (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env?.VITE_MEETING_SUMMARY_API_URL
   ?? '/api/meeting-summary'
 
+const API_BASE_URL = (
+  (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env?.VITE_API_BASE_URL ?? ''
+).replace(/\/$/, '')
+const AUTH_LOGIN_API_URL = `${API_BASE_URL}/api/auth/login`
+const AUTH_SIGNUP_API_URL = `${API_BASE_URL}/api/auth/signup`
+const AUTH_TOKEN_STORAGE_KEY = 'gcai-token'
+
+interface AuthUser { id: number; email: string; name: string | null; company: string | null }
+
 const toStringArray = (value: unknown): string[] => {
   if (!Array.isArray(value)) return []
   return value
@@ -1955,8 +2014,10 @@ function MeetingsTab({ lang, profile }: { lang: Lang; profile: UserProfile }) {
       formData.append('file', uploadedFile)
       formData.append('lang', lang)
 
+      const token = localStorage.getItem(AUTH_TOKEN_STORAGE_KEY)
       const response = await fetch(MEETING_SUMMARY_API_URL, {
         method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         body: formData,
       })
 
@@ -3254,8 +3315,18 @@ export default function App() {
   const [langFromProfile, setLangFromProfile] = useState(false)
   const [pendingSignup, setPendingSignup] = useState<SignupData | null>(null)
 
-  // Saved credentials from signup — used for login validation
-  const [savedUser, setSavedUser] = useState<{ email: string; password: string } | null>(null)
+  // JWT issued by the backend on login/signup — sent as Authorization: Bearer <token>
+  // on protected requests (e.g. meeting-summary upload).
+  const [authToken, setAuthToken] = useState<string | null>(() => localStorage.getItem(AUTH_TOKEN_STORAGE_KEY))
+
+  const setAuth = (token: string) => {
+    localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, token)
+    setAuthToken(token)
+  }
+  const clearAuth = () => {
+    localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY)
+    setAuthToken(null)
+  }
 
   // Lifted state — survives profile/lang subscreen navigation
   const [homeTab, setHomeTab] = useState<Tab>('meetings')
@@ -3272,6 +3343,20 @@ export default function App() {
     localStorage.setItem('gcai-dark', profile.darkMode ? '1' : '0')
   }, [profile.darkMode])
 
+  // Restore session on reload: verify the stored token is still valid and
+  // skip straight to the home screen, otherwise drop the stale token.
+  useEffect(() => {
+    if (!authToken) return
+    fetch(`${API_BASE_URL}/api/users/me`, { headers: { Authorization: `Bearer ${authToken}` } })
+      .then(res => { if (!res.ok) throw new Error('unauthorized'); return res.json() as Promise<AuthUser> })
+      .then(user => {
+        setProfile(p => ({ ...p, name: user.name ?? '', company: user.company ?? '', email: user.email }))
+        setScreen('home')
+      })
+      .catch(() => clearAuth())
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const showToast = (msg: string) => {
     setToast(msg)
@@ -3279,10 +3364,16 @@ export default function App() {
     toastTimer.current = setTimeout(() => setToast(''), 2500)
   }
 
-  const handleSignupCreated = (data: SignupData) => {
-    setSavedUser({ email: data.email, password: data.password })
+  const handleSignupCreated = (data: SignupData, token: string, _user: AuthUser) => {
+    setAuth(token)
     setPendingSignup(data)
     setScreen('langSelect')
+  }
+
+  const handleLogin = (token: string, user: AuthUser) => {
+    setAuth(token)
+    setProfile(p => ({ ...p, name: user.name ?? p.name, company: user.company ?? p.company, email: user.email }))
+    setScreen('home')
   }
 
   const handleLangSelect = (l: Lang) => {
@@ -3301,6 +3392,7 @@ export default function App() {
   }
 
   const handleLogout = () => {
+    clearAuth()
     setProfile(p => ({ ...EMPTY_PROFILE, lang, darkMode: p.darkMode }))
     setEditingProfile(false)
     setHomeTab('meetings')
@@ -3321,7 +3413,7 @@ export default function App() {
         <div style={{ position: 'absolute', top: 12, left: '50%', transform: 'translateX(-50%)', width: 120, height: 34, borderRadius: 20, background: '#000', zIndex: 100 }} />
         {toast && <Toast msg={toast} />}
         {screen === 'splash'     && <SplashScreen lang={lang} onStart={() => setScreen('login')} />}
-        {screen === 'login'      && <LoginScreen lang={lang} savedUser={savedUser} onLogin={() => setScreen('home')} onSignUp={() => setScreen('signup')} showToast={showToast} />}
+        {screen === 'login'      && <LoginScreen lang={lang} onLogin={handleLogin} onSignUp={() => setScreen('signup')} showToast={showToast} />}
         {screen === 'signup'     && <SignUpScreen lang={lang} onCreated={handleSignupCreated} onBack={() => setScreen('login')} showToast={showToast} />}
         {screen === 'langSelect' && <LangSelectScreen lang={lang} onSelect={handleLangSelect} onBack={() => { setLangFromProfile(false); setScreen('home') }} isSettings={langFromProfile} />}
         {screen === 'home' && !editingProfile && (
